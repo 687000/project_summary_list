@@ -1,6 +1,44 @@
-@import './reset.css';
-@import './variables.css';
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+/* ── Variables ── */
+:root {
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --bg:            #F7F6F3;
+  --surface:       #FFFFFF;
+  --border:        #D9DDD6;
+  --border-accent: #BFD3C2;
+  --text-primary:  #232826;
+  --text-secondary:#4B4F4B;
+  --text-muted:    #5C6D60;
+  --accent:        #46774C;
+  --accent-light:  #DCE8DA;
+  --accent-border: #BFD3C2;
+  --tag-bg:        #EEF2EC;
+  --tag-text:      #4B4F4B;
+  --section-label: #475651;
+  --radius:        14px;
+  --radius-sm:     6px;
+
+  --star-s:    #7c3aed;
+  --star-t:    #0369a1;
+  --star-a:    #0f766e;
+  --star-r:    #b45309;
+  --star-bg-s: #f5f3ff;
+  --star-bg-t: #f0f9ff;
+  --star-bg-a: #f0fdfa;
+  --star-bg-r: #fffbeb;
+}
+
+/* ── Global ── */
 body {
   font-family: var(--font-sans);
   background: var(--bg);
@@ -43,9 +81,7 @@ details.card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 details.card:hover {
@@ -120,7 +156,7 @@ details[open] .chevron {
 }
 
 .tag:hover {
-  background: var(--tag-bg-hover, #e0e0d8);
+  background: #e0e0d8;
 }
 
 .tag .delete-tag {
@@ -147,7 +183,7 @@ details[open] .chevron {
 }
 
 .add-tag:hover {
-  background: var(--tag-bg-hover, #e0e0d8);
+  background: #e0e0d8;
 }
 
 .edit-input {
@@ -210,17 +246,15 @@ details[open] .chevron {
   border: 1px solid var(--accent-border);
   border-radius: var(--radius-sm);
   background: var(--accent-light);
-  transition:
-    background 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .source-link:hover {
-  background: var(--accent-light-hover, #d0e4ce);
-  border-color: var(--accent-border-hover, #a0c0a8);
+  background: #d0e4ce;
+  border-color: #a0c0a8;
 }
 
-/* Expanded */
+/* ── Expanded ── */
 
 .card-expanded {
   padding: 0 1.5rem 1.5rem;
@@ -278,7 +312,7 @@ details[open] .chevron {
   font-weight: 700;
 }
 
-/* STAR */
+/* ── STAR ── */
 
 .star-block {
   display: grid;
@@ -297,18 +331,10 @@ details[open] .chevron {
   padding: 0.75rem 0.9rem;
 }
 
-.star-item:nth-child(1) {
-  background: var(--star-bg-s);
-}
-.star-item:nth-child(2) {
-  background: var(--star-bg-t);
-}
-.star-item:nth-child(3) {
-  background: var(--star-bg-a);
-}
-.star-item:nth-child(4) {
-  background: var(--star-bg-r);
-}
+.star-item:nth-child(1) { background: var(--star-bg-s); }
+.star-item:nth-child(2) { background: var(--star-bg-t); }
+.star-item:nth-child(3) { background: var(--star-bg-a); }
+.star-item:nth-child(4) { background: var(--star-bg-r); }
 
 .star-label {
   display: block;
@@ -318,18 +344,10 @@ details[open] .chevron {
   margin-bottom: 0.4rem;
 }
 
-.star-item:nth-child(1) .star-label {
-  color: var(--star-s);
-}
-.star-item:nth-child(2) .star-label {
-  color: var(--star-t);
-}
-.star-item:nth-child(3) .star-label {
-  color: var(--star-a);
-}
-.star-item:nth-child(4) .star-label {
-  color: var(--star-r);
-}
+.star-item:nth-child(1) .star-label { color: var(--star-s); }
+.star-item:nth-child(2) .star-label { color: var(--star-t); }
+.star-item:nth-child(3) .star-label { color: var(--star-a); }
+.star-item:nth-child(4) .star-label { color: var(--star-r); }
 
 .star-item p {
   font-size: 0.835rem;
@@ -337,7 +355,7 @@ details[open] .chevron {
   color: var(--text-secondary);
 }
 
-/* Arc */
+/* ── Arc ── */
 
 .arc-block {
   display: flex;
@@ -365,7 +383,7 @@ details[open] .chevron {
   line-height: 1.6;
 }
 
-/* Questions */
+/* ── Questions ── */
 
 .question-item {
   border-left: 2px solid var(--border-accent);
@@ -416,7 +434,7 @@ details[open] .chevron {
   font-weight: 700;
 }
 
-/* Role Emphasis */
+/* ── Roles ── */
 
 .role-item {
   margin-bottom: 0.75rem;
