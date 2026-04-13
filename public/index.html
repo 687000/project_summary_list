@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Portfolio</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #f5f5f0;
+        --surface: #ffffff;
+        --surface-hover: #fafaf8;
+        --border: #e8e8e4;
+        --border-accent: #d0d0c8;
+        --text-primary: #1a1a18;
+        --text-secondary: #5a5a54;
+        --text-muted: #8a8a82;
+        --accent: #2563eb;
+        --accent-light: #eff6ff;
+        --accent-border: #bfdbfe;
+        --tag-bg: #f0f0ea;
+        --tag-text: #4a4a42;
+        --section-label: #374151;
+        --star-s: #7c3aed;
+        --star-t: #0369a1;
+        --star-a: #0f766e;
+        --star-r: #b45309;
+        --star-bg-s: #f5f3ff;
+        --star-bg-t: #f0f9ff;
+        --star-bg-a: #f0fdfa;
+        --star-bg-r: #fffbeb;
+        --radius: 12px;
+        --radius-sm: 6px;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text-primary);
+        line-height: 1.6;
+        padding: 2rem 1rem 4rem;
+        min-height: 100vh;
+      }
+
+      .page-header {
+        max-width: 760px;
+        margin: 0 auto 2.5rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+      }
+
+      .page-header p {
+        margin-top: 0.35rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .card-count {
+        display: inline-block;
+        margin-top: 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .cards {
+        max-width: 760px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      details.card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+
+      details.card:hover {
+        border-color: var(--border-accent);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
+
+      details.card[open] {
+        border-color: var(--border-accent);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      details.card > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 1.25rem 1.5rem;
+        outline: none;
+        user-select: none;
+      }
+
+      details.card > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .card-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+      }
+
+      .chevron {
+        font-size: 1.4rem;
+        color: var(--text-muted);
+        line-height: 1;
+        flex-shrink: 0;
+        transform: rotate(90deg);
+        transition: transform 0.2s ease;
+        margin-top: 1px;
+      }
+
+      details[open] .chevron {
+        transform: rotate(270deg);
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.65rem;
+      }
+
+      .tag {
+        font-size: 0.7rem;
+        font-weight: 500;
+        background: var(--tag-bg);
+        color: var(--tag-text);
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        letter-spacing: 0.01em;
+        position: relative;
+        cursor: pointer;
+      }
+
+      .tag:hover {
+        background: var(--tag-bg-hover, #e0e0d8);
+      }
+
+      .tag .delete-tag {
+        margin-left: 0.3rem;
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+
+      .tag .delete-tag:hover {
+        color: #ff0000;
+      }
+
+      .add-tag {
+        font-size: 0.7rem;
+        font-weight: 500;
+        background: var(--tag-bg);
+        color: var(--tag-text);
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        border: 1px dashed var(--tag-text);
+      }
+
+      .add-tag:hover {
+        background: var(--tag-bg-hover, #e0e0d8);
+      }
+
+      .edit-input {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 0.2rem 0.4rem;
+        font-size: inherit;
+        font-family: inherit;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .dragging {
+        opacity: 0.5;
+        transform: rotate(5deg);
+      }
+
+      .drag-over {
+        border-top: 2px solid var(--accent);
+      }
+
+      .card-preview {
+        margin-top: 0.85rem;
+      }
+
+      .summary-text {
+        white-space: pre-wrap;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+      }
+
+      .summary-bullet {
+        margin-top: 0.6rem;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        display: flex;
+        gap: 0.4rem;
+      }
+
+      .bullet-arrow {
+        color: var(--accent);
+        flex-shrink: 0;
+        font-weight: 600;
+        margin-top: 0.05em;
+      }
+
+      .link-row {
+        margin-top: 0.85rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      .source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--accent);
+        text-decoration: none;
+        padding: 0.3rem 0.7rem;
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-sm);
+        background: var(--accent-light);
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+
+      .source-link:hover {
+        background: #dbeafe;
+        border-color: #93c5fd;
+      }
+
+      /* Expanded */
+
+      .card-expanded {
+        padding: 0 1.5rem 1.5rem;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin-bottom: 1.25rem;
+      }
+
+      .section {
+        margin-bottom: 1.4rem;
+      }
+
+      .section:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 0.6rem;
+      }
+
+      .section-body p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.65;
+      }
+
+      .bullet-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .bullet-list li {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        padding-left: 1.1rem;
+        position: relative;
+      }
+
+      .bullet-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      /* STAR */
+
+      .star-block {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+      }
+
+      @media (max-width: 560px) {
+        .star-block {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .star-item {
+        border-radius: var(--radius-sm);
+        padding: 0.75rem 0.9rem;
+      }
+
+      .star-item:nth-child(1) {
+        background: var(--star-bg-s);
+      }
+      .star-item:nth-child(2) {
+        background: var(--star-bg-t);
+      }
+      .star-item:nth-child(3) {
+        background: var(--star-bg-a);
+      }
+      .star-item:nth-child(4) {
+        background: var(--star-bg-r);
+      }
+
+      .star-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.4rem;
+      }
+
+      .star-item:nth-child(1) .star-label {
+        color: var(--star-s);
+      }
+      .star-item:nth-child(2) .star-label {
+        color: var(--star-t);
+      }
+      .star-item:nth-child(3) .star-label {
+        color: var(--star-a);
+      }
+      .star-item:nth-child(4) .star-label {
+        color: var(--star-r);
+      }
+
+      .star-item p {
+        font-size: 0.835rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
+
+      /* Arc */
+
+      .arc-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .arc-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .arc-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--section-label);
+      }
+
+      .arc-item p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* Questions */
+
+      .question-item {
+        border-left: 2px solid var(--border-accent);
+        padding-left: 0.9rem;
+        margin-bottom: 0.9rem;
+      }
+
+      .question-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .question-text {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.5;
+        margin-bottom: 0.3rem;
+      }
+
+      .question-intent {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-style: italic;
+        margin-bottom: 0.45rem;
+      }
+
+      .answer-frames {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        margin-top: 0.4rem;
+      }
+
+      .answer-frames li {
+        font-size: 0.835rem;
+        color: var(--text-secondary);
+        line-height: 1.55;
+        padding-left: 1rem;
+        position: relative;
+      }
+
+      .answer-frames li::before {
+        content: "›";
+        position: absolute;
+        left: 0;
+        color: var(--text-muted);
+        font-weight: 700;
+      }
+
+      /* Role Emphasis */
+
+      .role-item {
+        margin-bottom: 0.75rem;
+      }
+
+      .role-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .role-label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--section-label);
+        margin-bottom: 0.35rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="page-header">
+      <h1></h1>
+      <p></p>
+    </header>
+    <div class="cards" id="cards-container"></div>
+    <script>
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCXSS72HgGD_8swIahYtNgSlqXvnKhPxuQ",
+        authDomain: "project-summary-data.firebaseapp.com",
+        projectId: "project-summary-data",
+        storageBucket: "project-summary-data.firebasestorage.app",
+        messagingSenderId: "1089446666374",
+        appId: "1:1089446661374:web:b1bf3beacdf29272767107",
+        measurementId: "G-CTD6CTD1E9",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+      const portfolioDoc = db.collection("portfolio").doc("data");
+
+      let portfolioData = null;
+      let unsubscribeSnapshot = null;
+
+      async function updateDatabase() {
+        try {
+          await portfolioDoc.set(portfolioData);
+        } catch (err) {
+          console.warn("Firestore save failed:", err);
+        }
+      }
+      function listenToPortfolio() {
+        if (unsubscribeSnapshot) {
+          unsubscribeSnapshot();
+        }
+        unsubscribeSnapshot = portfolioDoc.onSnapshot(
+          async (doc) => {
+            if (doc.exists) {
+              portfolioData = doc.data();
+              renderPage();
+            }
+          },
+          async (err) => {
+            document.getElementById("cards-container").innerHTML =
+              `<pre>Failed to sync Firestore: ${err.message}</pre>`;
+          },
+        );
+      }
+      listenToPortfolio();
+
+      function renderPage() {
+        // Update header
+        document.querySelector(".page-header h1").textContent =
+          portfolioData.page_header.title;
+        document.querySelector(".page-header p").textContent =
+          portfolioData.page_header.subtitle;
+
+        // Generate cards
+        const container = document.getElementById("cards-container");
+        let html = "";
+        portfolioData.cards.forEach((card, index) => {
+          const tagsHtml = card.tags
+            .map(
+              (tag, tagIndex) =>
+                `<span class="tag" data-card-index="${index}" data-tag-index="${tagIndex}" onclick="editTag(${index}, ${tagIndex})">${tag}<span class="delete-tag" onclick="deleteTag(event, ${index}, ${tagIndex})">×</span></span>`,
+            )
+            .join("") + `<span class="add-tag" data-card-index="${index}" onclick="addTag(${index})">+</span>`;
+
+          const sourceLinks = Array.isArray(card.source_link)
+            ? card.source_link
+            : card.source_link
+              ? [card.source_link]
+              : [];
+
+          const sourceLinkHtml = sourceLinks.length
+            ? `<div class="link-row">
+                ${sourceLinks
+                  .map(
+                    (link, linkIndex) =>
+                      `<a class="source-link" href="${link}" target="_blank" rel="noreferrer">View Source ${sourceLinks.length > 1 ? linkIndex + 1 : ""} ↗</a>`,
+                  )
+                  .join("")}
+              </div>`
+            : "";
+
+          const sectionsHtml = card.sections
+            .map(
+              (section) => `
+                <div class="section">
+                  <div class="section-label">${section.label}</div>
+                  <div class="section-body">${renderSection(section.content)}</div>
+                </div>
+              `,
+            )
+            .join("");
+
+          html += `
+            <details class="card" draggable="true" data-index="${index}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragend="dragEnd(event)">
+              <summary>
+                <div class="card-header">
+                  <div class="card-title-row">
+                    <h2 class="card-title" onclick="editTitle(${index})">${card.title}</h2>
+                    <span class="chevron">›</span>
+                  </div>
+                  <div class="tags">${tagsHtml}</div>
+                </div>
+                <div class="card-preview">
+                  <p class="summary-text" onclick="editSummary(${index})">${card.summary_text}</p>
+                  <p class="summary-bullet"><span class="bullet-arrow">→</span><span onclick="editBullet(${index})">${card.summary_bullet.slice(2)}</span></p>
+                  ${sourceLinkHtml}
+                </div>
+              </summary>
+              <div class="card-expanded">
+                <div class="divider"></div>
+                ${sectionsHtml}
+              </div>
+            </details>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      function renderSection(content) {
+        switch (content.type) {
+          case "text":
+            return `<p>${content.text}</p>`;
+          case "list":
+            return `<ul class="bullet-list">${content.items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+          case "star":
+            return `
+            <div class="star-block">
+              ${content.items
+                .map(
+                  (item) => `
+                <div class="star-item">
+                  <span class="star-label">${item.label}</span>
+                  <p>${item.text}</p>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          `;
+          case "arc":
+            return `
+            <div class="arc-block">
+              ${content.items
+                .map(
+                  (item) => `
+                <div class="arc-item">
+                  <span class="arc-label">${item.label}</span>
+                  <p>${item.text}</p>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          `;
+          case "questions":
+            return content.items
+              .map(
+                (item) => `
+            <div class="question-item">
+              <p class="question-text">${item.question}</p>
+              <p class="question-intent">${item.intent}</p>
+              <ul class="answer-frames">${item.answer_frames.map((frame) => `<li>${frame}</li>`).join("")}</ul>
+            </div>
+          `,
+              )
+              .join("");
+          case "roles":
+            return content.items
+              .map(
+                (item) => `
+            <div class="role-item">
+              <span class="role-label">${item.label}</span>
+              <ul class="bullet-list">${item.items.map((entry) => `<li>${entry}</li>`).join("")}</ul>
+            </div>
+          `,
+              )
+              .join("");
+          default:
+            return "";
+        }
+      }
+
+      // Drag and Drop
+      let draggedIndex = null;
+
+      function dragStart(event) {
+        const card = event.currentTarget;
+        draggedIndex = parseInt(card.dataset.index, 10);
+        card.classList.add("dragging");
+      }
+
+      function dragOver(event) {
+        event.preventDefault();
+      }
+
+      function drop(event) {
+        event.preventDefault();
+        const card = event.currentTarget;
+        card.classList.remove("dragging");
+        const afterElement = getDragAfterElement(event.clientY);
+        let insertIndex;
+        if (afterElement == null) {
+          insertIndex = portfolioData.cards.length - 1;
+        } else {
+          insertIndex = parseInt(afterElement.dataset.index, 10);
+          if (insertIndex > draggedIndex) {
+            insertIndex--;
+          }
+        }
+        if (draggedIndex !== null && draggedIndex !== insertIndex) {
+          const [removed] = portfolioData.cards.splice(draggedIndex, 1);
+          portfolioData.cards.splice(insertIndex, 0, removed);
+          updateDatabase();
+          renderPage();
+        }
+      }
+
+      function dragEnd(event) {
+        event.target.classList.remove("dragging");
+        draggedIndex = null;
+      }
+
+      function getDragAfterElement(y) {
+        const draggableElements = [
+          ...document.querySelectorAll(".card:not(.dragging)"),
+        ];
+        return draggableElements.reduce(
+          (closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+              return { offset: offset, element: child };
+            } else {
+              return closest;
+            }
+          },
+          { offset: Number.NEGATIVE_INFINITY },
+        ).element;
+      }
+
+      // Editing functions
+      function editTitle(index) {
+        const titleEl = event.target;
+        const currentText = titleEl.textContent;
+        const input = document.createElement("input");
+        input.className = "edit-input";
+        input.value = currentText;
+        input.onblur = () => saveTitle(index, input.value);
+        input.onkeydown = (e) => {
+          if (e.key === "Enter") input.blur();
+          if (e.key === "Escape") {
+            input.value = currentText;
+            input.blur();
+          }
+        };
+        titleEl.replaceWith(input);
+        input.focus();
+      }
+
+      function saveTitle(index, newTitle) {
+        portfolioData.cards[index].title = newTitle;
+        updateDatabase();
+        renderPage();
+      }
+
+      function editSummary(index) {
+        const summaryEl = event.target;
+        const currentText = summaryEl.textContent;
+        const input = document.createElement("textarea");
+        input.className = "edit-input";
+        input.value = currentText;
+        input.rows = 3;
+        input.onblur = () => saveSummary(index, input.value);
+        input.onkeydown = (e) => {
+          if (e.key === "Enter" && e.ctrlKey) input.blur();
+          if (e.key === "Escape") {
+            input.value = currentText;
+            input.blur();
+          }
+        };
+        summaryEl.replaceWith(input);
+        input.focus();
+      }
+
+      function saveSummary(index, newSummary) {
+        portfolioData.cards[index].summary_text = newSummary;
+        updateDatabase();
+        renderPage();
+      }
+
+      function editBullet(index) {
+        const bulletEl = event.target;
+        const currentText = bulletEl.textContent;
+        const input = document.createElement("input");
+        input.className = "edit-input";
+        input.value = currentText;
+        input.onblur = () => saveBullet(index, input.value);
+        input.onkeydown = (e) => {
+          if (e.key === "Enter") input.blur();
+          if (e.key === "Escape") {
+            input.value = currentText;
+            input.blur();
+          }
+        };
+        bulletEl.replaceWith(input);
+        input.focus();
+      }
+
+      function saveBullet(index, newBullet) {
+        portfolioData.cards[index].summary_bullet = "→ " + newBullet;
+        updateDatabase();
+        renderPage();
+      }
+
+      // Tag CRUD
+      function editTag(cardIndex, tagIndex) {
+        const tagEl = event.target.closest(".tag");
+        const currentText = tagEl.textContent.replace("×", "").trim();
+        const input = document.createElement("input");
+        input.className = "edit-input";
+        input.value = currentText;
+        input.onblur = () => saveTag(cardIndex, tagIndex, input.value);
+        input.onkeydown = (e) => {
+          if (e.key === "Enter") input.blur();
+          if (e.key === "Escape") {
+            input.value = currentText;
+            input.blur();
+          }
+        };
+        tagEl.replaceWith(input);
+        input.focus();
+      }
+
+      function saveTag(cardIndex, tagIndex, newTag) {
+        if (newTag.trim()) {
+          portfolioData.cards[cardIndex].tags[tagIndex] = newTag.trim();
+        }
+        updateDatabase();
+        renderPage();
+      }
+
+      function deleteTag(event, cardIndex, tagIndex) {
+        event.stopPropagation();
+        portfolioData.cards[cardIndex].tags.splice(tagIndex, 1);
+        updateDatabase();
+        renderPage();
+      }
+
+      function addTag(cardIndex) {
+        const newTag = prompt("Enter new tag:");
+        if (newTag && newTag.trim()) {
+          portfolioData.cards[cardIndex].tags.push(newTag.trim());
+          updateDatabase();
+          renderPage();
+        }
+      }
+    </script>
+  </body>
+</html>
