@@ -1,0 +1,78 @@
+:root {
+  /* ── Fonts ── */
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ── Legacy mapped variables ── */
+  --bg:            #F7F6F3;
+  --surface:       #FFFFFF;
+  --surface-hover: #F1F3EE;
+  --border:        #D9DDD6;
+  --border-accent: #BFD3C2;
+  --text-primary:  #232826;
+  --text-secondary:#4B4F4B;
+  --text-muted:    #5C6D60;
+  --accent:        #46774C;
+  --accent-light:  #DCE8DA;
+  --accent-border: #BFD3C2;
+  --tag-bg:        #EEF2EC;
+  --tag-text:      #4B4F4B;
+  --section-label: #475651;
+  --radius:        14px;
+  --radius-sm:     6px;
+
+  /* ── STAR method colors (no equivalent in new palette) ── */
+  --star-s:    #7c3aed;
+  --star-t:    #0369a1;
+  --star-a:    #0f766e;
+  --star-r:    #b45309;
+  --star-bg-s: #f5f3ff;
+  --star-bg-t: #f0f9ff;
+  --star-bg-a: #f0fdfa;
+  --star-bg-r: #fffbeb;
+
+  /* ── Full color palette ── */
+  --bg-2:        #F1F3EE;
+  --bg-3:        #DCE8DA;
+  --sage-accent: #DCE8DA;
+  --sage-mid:    #BFD3C2;
+  --sage-dark:   #46774C;
+  --hero-start:  #8FD3CC;
+  --hero-end:    #BFE6D8;
+  --border-soft: rgba(217, 221, 214, 0.5);
+  --tx-light:    #5C6D60;
+  --tx:          #4B4F4B;
+  --tx-dark:     #232826;
+  --btn-dark:    #2F3431;
+  --btn-dark-h:  #1F2421;
+  --btn-sec:     #EEF2EC;
+  --btn-sec-h:   #E3E8E0;
+  --white:       #FFFFFF;
+  --glass-tint:  rgba(220, 232, 218, 0.65);
+  --charcoal:    #475651;
+
+  /* ── Layout ── */
+  --max:    1160px;
+  --pad:    0 24px;
+  --sec-py: 96px;
+  --nav-h:  64px;
+
+  /* ── Radii ── */
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  20px;
+  --r-2xl: 28px;
+  --r-3xl: 36px;
+  --r-f:   9999px;
+
+  /* ── Shadows ── */
+  --sh-xs: 0 1px 4px rgba(35, 40, 38, 0.04);
+  --sh-sm: 0 4px 18px rgba(35, 40, 38, 0.07);
+  --sh-md: 0 12px 36px rgba(35, 40, 38, 0.09);
+  --sh-lg: 0 24px 60px rgba(35, 40, 38, 0.13);
+
+  /* ── Easing ── */
+  --ease:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-b: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
