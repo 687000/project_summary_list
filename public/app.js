@@ -1,8 +1,46 @@
 // ── Store ──
 var portfolioData = null;
+var isEditMode = false;
 
 function setPortfolioData(data) {
   portfolioData = data;
+}
+
+// ── Mode & Auth ──
+function detectEditRoute() {
+  var path = window.location.pathname;
+  return path === '/edit' || path === '/edit/';
+}
+
+function showLoginModal() {
+  document.getElementById('login-modal').classList.add('visible');
+  ui.start('#firebaseui-auth-container', uiConfig);
+}
+
+function hideLoginModal() {
+  document.getElementById('login-modal').classList.remove('visible');
+  ui.reset();
+}
+
+function enterEditMode() {
+  isEditMode = true;
+  hideLoginModal();
+  document.getElementById('edit-banner').classList.add('visible');
+  document.body.classList.add('edit-active');
+  if (portfolioData) renderPage();
+}
+
+function exitEditMode() {
+  isEditMode = false;
+  document.getElementById('edit-banner').classList.remove('visible');
+  document.body.classList.remove('edit-active');
+  if (portfolioData) renderPage();
+}
+
+function logout() {
+  // Push to '/' before signOut so onAuthStateChanged sees '/' and skips the modal
+  window.history.pushState({}, '', '/');
+  firebase.auth().signOut();
 }
 
 // ── Firebase ──
@@ -17,6 +55,28 @@ var firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
+
+// ── FirebaseUI ──
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
+var uiConfig = {
+  callbacks: {
+    signInSuccessWithAuthResult: function() {
+      return false;
+    },
+    signInFailure: function(error) {
+      console.error('FirebaseUI sign-in failure:', error.code, error.message, error);
+      return Promise.resolve();
+    }
+  },
+  signInFlow: 'popup',
+  signInOptions: [
+    {
+      provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      requireDisplayName: false,
+      disableSignUp: { status: true }
+    }
+  ]
+};
 
 // ── Portfolio Service ──
 var portfolioDoc = db.collection("portfolio").doc("data");
@@ -46,6 +106,59 @@ function listenToPortfolio(onData, onError) {
 }
 
 // ── Card Component ──
+// Sections whose labels match these filters are shown in display mode
+var DISPLAY_SECTION_FILTERS = ['owner', 'technical', 'highlight'];
+
+function isDisplaySection(label) {
+  var lower = label.toLowerCase();
+  return DISPLAY_SECTION_FILTERS.some(function(keyword) {
+    return lower.indexOf(keyword) !== -1;
+  });
+}
+
+function createDisplayCardHtml(card, index) {
+  var tagsHtml = card.tags.map(function(tag) {
+    return '<span class="tag display-tag">' + tag + '</span>';
+  }).join('');
+
+  var bulletText = card.summary_bullet ? card.summary_bullet.slice(2) : '';
+
+  var filteredSections = card.sections.filter(function(section) {
+    return isDisplaySection(section.label);
+  });
+
+  var sectionsHtml = filteredSections.map(function(section) {
+    return '<div class="section">' +
+      '<div class="section-label">' + section.label + '</div>' +
+      '<div class="section-body">' + renderSection(section.content) + '</div>' +
+      '</div>';
+  }).join('');
+
+  var hasExpand = filteredSections.length > 0;
+
+  return '<details class="card" data-index="' + index + '">' +
+    '<summary' + (!hasExpand ? ' onclick="event.preventDefault()" class="no-expand"' : '') + '>' +
+      '<div class="card-header">' +
+        '<div class="card-title-row">' +
+          '<h2 class="card-title">' + card.title + '</h2>' +
+          (hasExpand ? '<span class="chevron">›</span>' : '') +
+        '</div>' +
+        '<div class="tags">' + tagsHtml + '</div>' +
+      '</div>' +
+      '<div class="card-preview">' +
+        '<p class="summary-text">' + card.summary_text + '</p>' +
+        (bulletText
+          ? '<div class="detail-row">' +
+              '<span class="detail-label">Details</span>' +
+              '<p class="summary-bullet"><span class="bullet-arrow">→</span><span>' + bulletText + '</span></p>' +
+            '</div>'
+          : '') +
+      '</div>' +
+    '</summary>' +
+    (hasExpand ? '<div class="card-expanded"><div class="divider"></div>' + sectionsHtml + '</div>' : '') +
+    '</details>';
+}
+
 function renderSection(content) {
   switch (content.type) {
     case "text":
@@ -136,7 +249,7 @@ function renderPage() {
   document.querySelector(".page-header p").textContent = portfolioData.page_header.subtitle;
   var container = document.getElementById("cards-container");
   container.innerHTML = portfolioData.cards.map(function(card, index) {
-    return createCardHtml(card, index);
+    return isEditMode ? createCardHtml(card, index) : createDisplayCardHtml(card, index);
   }).join('');
 }
 
@@ -297,3 +410,18 @@ listenToPortfolio(
       '<pre>Failed to sync Firestore: ' + err.message + '</pre>';
   }
 );
+
+var isInitialAuthCheck = true;
+
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    enterEditMode();
+  } else {
+    // Capture route BEFORE exitEditMode, and only show modal on the first check
+    // (not on explicit logout, where logout() already pushed '/' before signOut)
+    var onEditRoute = isInitialAuthCheck && detectEditRoute();
+    exitEditMode();
+    if (onEditRoute) showLoginModal();
+  }
+  isInitialAuthCheck = false;
+});

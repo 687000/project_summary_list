@@ -453,3 +453,171 @@ details[open] .chevron {
   color: var(--section-label);
   margin-bottom: 0.35rem;
 }
+
+/* ── Edit Banner ── */
+.edit-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  z-index: 999;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.edit-banner.visible {
+  display: flex;
+}
+
+.edit-banner span {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.edit-banner button {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+}
+
+.edit-banner button:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+body.edit-active {
+  padding-top: 4rem;
+}
+
+/* ── Login Modal ── */
+.login-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-modal.visible {
+  display: flex;
+}
+
+.login-box {
+  width: 360px;
+  max-width: 90vw;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+
+.login-field {
+  margin-bottom: 1rem;
+}
+
+.login-field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.login-field input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  outline: none;
+  color: var(--text-primary);
+}
+
+.login-field input:focus {
+  border-color: var(--accent);
+}
+
+.login-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  min-height: 1.2em;
+  margin-bottom: 0.75rem;
+}
+
+.login-submit {
+  width: 100%;
+  padding: 0.6rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.login-submit:hover {
+  background: #3a6640;
+}
+
+/* ── FirebaseUI Overrides ── */
+.firebaseui-id-secondary-link {
+  display: none !important;
+}
+.firebaseui-container {
+  max-width: 100% !important;
+  font-family: var(--font-sans) !important;
+}
+
+.firebaseui-form-actions .mdl-button--raised.mdl-button--colored {
+  background: var(--accent) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.firebaseui-form-actions .mdl-button--raised.mdl-button--colored:hover {
+  background: #3a6640 !important;
+}
+
+.firebaseui-link {
+  color: var(--accent) !important;
+}
+
+.mdl-progress > .progressbar {
+  background-color: var(--accent) !important;
+}
+
+/* ── Display Mode ── */
+.display-tag {
+  cursor: default;
+}
+
+.display-tag:hover {
+  background: var(--tag-bg);
+}
+
+summary.no-expand {
+  cursor: default;
+}
+
+.detail-row {
+  margin-top: 0.75rem;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
